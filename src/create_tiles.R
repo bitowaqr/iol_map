@@ -10,15 +10,16 @@ event_sp = shapefile(x = "./raw/event_sp")
 
 raster_grid <- raster(ncol=500, nrow=500)
 extent(raster_grid) <- extent(lsoa_sp)
-rasterized_lsoa <- rasterize(lsoa_sp, r, "mn_dstn")
-plot(rp)
+rasterized_lsoa <- rasterize(lsoa_sp, raster_grid, "mn_dstn")
+# plot(rasterized_lsoa)
 
-writeRaster(rp, filename="test.tif", format="GTiff", overwrite=TRUE)
-map <- "./test.tif"
-r = raster(map)
-crs <- "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
-pal <- colorRampPalette(c("darkblue", "lightblue"))(20)
-tile(map, tile_dir, "3-8", crs = crs,col = pal, colNA = nodata)
+writeRaster(rasterized_lsoa, filename="./raw/lsoa_mn_dstn.tif", format="GTiff", overwrite=TRUE)
+mn_dsnt_tif_path <- "./raw/lsoa_mn_dstn.tif"
+# rasterized_lsoa = raster(mn_dsnt_tif_path)
+# pal <- colorRampPalette(c("darkblue", "lightblue"))(20)
+
+crs <- "+proj=longlat +ellps=WGS84 +no_defs"
+tile(mn_dsnt_tif_path, tile_dir, "7-8", crs = crs)
 
 library(leaflet)
 tiles <- "https://bitowaqr.github.io/iol_map/tiles/{z}/{x}/{y}.png"
