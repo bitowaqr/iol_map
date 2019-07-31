@@ -4,7 +4,7 @@
 event_sp = shapefile(x = "./raw/event_sp")
 library(leaflet)
   
-  tiles_distance <- "https://bitowaqr.github.io/iol_map/tiles/{z}/{x}/{y}.png"
+  tiles_distance <- "https://bitowaqr.github.io/iol_map/tiles_distance/{z}/{x}/{y}.png"
   
   leaflet(options = leafletOptions(minZoom = 4, maxZoom = 12), width = "100%") %>%
   

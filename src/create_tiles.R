@@ -12,8 +12,7 @@ tile_dir_mn_dstn <- paste(getwd(),"/tiles_distance/",sep="")
 tile_dir_participation <- paste(getwd(),"/tiles_participation/",sep="")
 
 # load data
-lsoa_sp = shapefile(x = "./raw/lsoa_sf")
-lsoa_sf = st_as_sf(lsoa_sp)
+lsoa_sf = st_as_sf(shapefile(x = "./raw/lsoa_sp"))
 
 # define raster grid
 raster_grid <- raster(ncol=5000, nrow=5000)
@@ -22,8 +21,8 @@ extent(raster_grid) <- extent(lsoa_sf)
 # mn distance tile
 lsoa_sf$mn_dstn_cuts = cut(lsoa_sf$mn_dstn,breaks = c(0,1,2.5,5,10,max(lsoa_sf$mn_dstn)))
 rasterized_lsoa_mn_dstn5 <- fasterize(lsoa_sf, raster_grid, "mn_dstn_cuts")
-writeRaster(rasterized_lsoa_mn_dstn5, filename="./raw/lsoa_mn_dstn.tif", format="GTiff", overwrite=TRUE)
 mn_dsnt_tif_path <- "./raw/lsoa_mn_dstn.tif"
+writeRaster(rasterized_lsoa_mn_dstn5, filename= mn_dsnt_tif_path, format="GTiff", overwrite=TRUE)
 crs_dist <- as.character(crs(rasterized_lsoa_mn_dstn5))
 pal <- colorRampPalette(c("darkgreen","green","orange","red","darkred"))(5)
 nodata <- "white"
@@ -33,9 +32,9 @@ rm("rasterized_lsoa_mn_dstn5")
 # participation tile
 # lsoa_sf$part_cuts = base::cut(lsoa_sf$rns_pm_,include.lowest = T,breaks = c(min(lsoa_sf$rns_pm_),0.1^5,0.5,1,2,max(lsoa_sf$rns_pm_)+1))
 lsoa_sf$part_cuts = base::cut(lsoa_sf$rns_pm_,include.lowest = T,breaks = c(-1,0,0.5,1,2,20))
-rasterized_lsoa_part5 <- rasterize(lsoa_sf, raster_grid, "part_cuts")
-writeRaster(rasterized_lsoa_part5, filename="./raw/lsoa_participation_5.tif", format="GTiff", overwrite=TRUE)
+rasterized_lsoa_part5 <- fasterize(lsoa_sf, raster_grid, "part_cuts")
 part_tif_path <- "./raw/lsoa_participation_5.tif"
+writeRaster(rasterized_lsoa_part5, filename=part_tif_path, format="GTiff", overwrite=TRUE)
 crs <- as.character(crs(rasterized_lsoa_part5))
 pal_part <- colorRampPalette(c("darkred","red","orange","green","darkgreen"))(5)
 nodata <- "white"
