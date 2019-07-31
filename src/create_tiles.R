@@ -1,33 +1,31 @@
+# load libraries
 library(raster)
 library(tiler)
 library(leaflet)
 
+# set tiler options
 tiler_options(python = "python3")
 tile_dir <- paste(getwd(),"/tiles/",sep="")
 
+# load data
 lsoa_sp = shapefile(x = "./raw/lsoa_sp")
-event_sp = shapefile(x = "./raw/event_sp")
 
-
+# define raster grid
 raster_grid <- raster(ncol=1000, nrow=1000)
 extent(raster_grid) <- extent(lsoa_sp)
-lsoa_sp$mn_dstn_quantile = cut(lsoa_sp$mn_dstn,breaks = quantile(lsoa_sp$mn_dstn,probs = seq(0,1,by=0.1)))
-rasterized_lsoa <- rasterize(lsoa_sp, raster_grid, "mn_dstn_quantile")
-# plot(rasterized_lsoa)
 
+# mn distance tile
+lsoa_sp$mn_dstn_cuts = cut(lsoa_sp$mn_dstn,breaks = c(min(lsoa_sp$mn_dstn),1,2.5,5,10,20,max(lsoa_sp$mn_dstn)))
+rasterized_lsoa <- rasterize(lsoa_sp, raster_grid, "mn_dstn_cuts")
+# rasterized_lsoa = raster("./raw/lsoa_mn_dstn.tif")
+# plot(rasterized_lsoa)
 writeRaster(rasterized_lsoa, filename="./raw/lsoa_mn_dstn.tif", format="GTiff", overwrite=TRUE)
 mn_dsnt_tif_path <- "./raw/lsoa_mn_dstn.tif"
-# rasterized_lsoa = raster(mn_dsnt_tif_path)
-# pal <- colorRampPalette(c("darkblue", "lightblue"))(20)
 
 crs <- as.character(crs(rasterized_lsoa))
-# tile(mn_dsnt_tif_path, tile_dir, "5-8", crs = crs)
-
- 
-pal <- colorRampPalette(c("darkgreen","yellow","greenyellow","gold","orange", "red","darkred"))(10)
-pal <- colorRampPalette(c("darkgreen","yellow","greenyellow","gold","orange", "red","darkred"))(10)
-#nodata <- "white"
-tile(mn_dsnt_tif_path, tile_dir, "4-11", col = pal,crs = crs)
+pal <- colorRampPalette(c("darkgreen","green","orange","red","darkred"))(5)
+nodata <- "white"
+tile(mn_dsnt_tif_path, tile_dir, "1-11", col = pal,crs = crs)
      
 
 
