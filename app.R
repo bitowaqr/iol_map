@@ -22,11 +22,12 @@ event_sp = shapefile("./raw/event_sp")
 print("Data loaded");cat("Cat ")
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
-    
+ui <- bootstrapPage(
+    tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
+    tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;}"),
     titlePanel("IOLMAP"),
     
-    leafletOutput('map',height = 700),
+    leafletOutput('map'),
     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
                   draggable = TRUE, top = 160, right = "auto", left = 20, bottom = "auto",
                   width = 330, height = "auto",
