@@ -82,7 +82,10 @@ ui <- bootstrapPage(
 server <- function(input, output) {
     
     output$map <- renderLeaflet({
-        tiles <- "https://bitowaqr.github.io/iol_map/tiles/{z}/{x}/{y}.png"
+        
+        tiles_distance <- "https://bitowaqr.github.io/iol_map/tiles_distance/{z}/{x}/{y}.png"
+        
+        
         leaflet(options = leafletOptions(minZoom = 4, maxZoom = 11), width = "100%") %>% 
             
             
@@ -92,7 +95,7 @@ server <- function(input, output) {
             
             
             # my tile
-            addTiles(tiles, options = tileOptions(opacity = 0.5),group="Distances") %>%
+            addTiles(tiles_distance, options = tileOptions(opacity = 0.5),group="Distances") %>%
             
             
             # established events
