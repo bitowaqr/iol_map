@@ -11,7 +11,7 @@ library(shiny)
 library(leaflet)
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
+    
     titlePanel("IOLMAP"),
     sidebarLayout(
         position = "left",fluid=F,
@@ -30,20 +30,26 @@ ui <- fluidPage(
                 ),
                 selectInput("add_layers","Show",choices = c("LSOA centroids","Something else"),multiple = T),
                 div("hello", style = "font-size:75%")
-                )
+            )
         )
-        )
+    )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-
+    
     output$map <- renderLeaflet({
         tiles <- "https://bitowaqr.github.io/iol_map/tiles/{z}/{x}/{y}.png"
         leaflet(options = leafletOptions(minZoom = 4, maxZoom = 11), width = "100%") %>% 
-            addProviderTiles(providers$CartoDB.Positron) %>% 
-            addTiles(tiles, options = tileOptions(opacity = 1)) %>%
-            setView(0, 52, zoom = 5) 
+            addProviderTiles(providers$CartoDB.Positron, group="Carto") %>% 
+            addTiles(tiles, options = tileOptions(opacity = 1),group="Distances") %>%
+            setView(0, 52, zoom = 5) %>%
+            addLayersControl(
+                baseGroups = c("Carto"),
+                 overlayGroups = c("Distances"),
+                options = layersControlOptions(collapsed = F,autoZIndex=T) 
+            ) %>%
+            hideGroup("Distances") 
     })
 }
 
