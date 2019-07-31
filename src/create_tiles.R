@@ -11,7 +11,7 @@ tile_dir <- paste(getwd(),"/tiles/",sep="")
 lsoa_sp = shapefile(x = "./raw/lsoa_sp")
 
 # define raster grid
-raster_grid <- raster(ncol=1000, nrow=1000)
+raster_grid <- raster(ncol=5000, nrow=5000)
 extent(raster_grid) <- extent(lsoa_sp)
 
 # mn distance tile
@@ -33,13 +33,13 @@ tile(mn_dsnt_tif_path, tile_dir, "1-11", col = pal,crs = crs)
 # plotRGB(x)
 
 
-tiles <- "https://bitowaqr.github.io/iol_map/tiles/{z}/{x}/{y}.png"
-leaflet(options = leafletOptions(minZoom = 4, maxZoom = 11), width = "100%") %>% 
-  addProviderTiles(providers$CartoDB.Positron) %>% 
-  addTiles(tiles, options = tileOptions(opacity = 1)) %>%
-  setView(0, 52, zoom = 5) 
-
-
-
-
-
+# tiles <- "https://bitowaqr.github.io/iol_map/tiles/{z}/{x}/{y}.png"
+# leaflet(options = leafletOptions(minZoom = 4, maxZoom = 11), width = "100%") %>% 
+#   addProviderTiles(providers$CartoDB.Positron) %>% 
+#   addTiles(tiles, options = tileOptions(opacity = 1)) %>%
+#   setView(0, 52, zoom = 5) 
+# 
+# 
+# 
+# 
+# 
