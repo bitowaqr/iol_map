@@ -6,6 +6,7 @@ library(leaflet)
   
   tiles_distance <- "https://bitowaqr.github.io/iol_map/tiles_distance/{z}/{x}/{y}.png"
   tiles_participation <- "https://bitowaqr.github.io/iol_map/tiles_participation/{z}/{x}/{y}.png"
+  tiles_imd <- "https://bitowaqr.github.io/iol_map/tiles_imd/{z}/{x}/{y}.png"
   
   leaflet(options = leafletOptions(minZoom = 4, maxZoom = 12), width = "100%",height = 800) %>%
   
@@ -19,6 +20,7 @@ library(leaflet)
     # my tile
     addTiles(tiles_distance, options = tileOptions(opacity = 0.5),group="Distances") %>%
     addTiles(tiles_participation, options = tileOptions(opacity = 0.5),group="Participation") %>%
+    addTiles(tiles_imd, options = tileOptions(opacity = 0.5),group="IMD") %>%
     
     # established events
     addCircleMarkers(
@@ -42,7 +44,18 @@ library(leaflet)
       labFormat = labelFormat(prefix = "", suffix = "km", between = " &ndash; ",
                               digits = 0, big.mark = ",", transform = identity)
       ) %>%
-    
+    addLegend(
+      group = "IMD",
+      colors =c("darkgreen","green","orange","red","darkred"),
+      title = "Index of Multiple <br> Deprivation Quintiles",
+      labels = c("Least deprived","Less deprived","","More deprived","Most deprived")
+    ) %>%
+    addLegend(
+      group = "Participation",
+      colors =c("darkred","red","orange","green","darkgreen"),
+      title = "parkrun runs per <br> 1,000 per week",
+      labels = c("&nbsp 0","0-0.5","0.5-1","1 - 2",">2")
+    ) %>%
     
     
   
@@ -50,10 +63,11 @@ library(leaflet)
   setView(0, 52, zoom = 7) %>%
     addLayersControl(
       baseGroups = c("OSM","Carto"),
-      overlayGroups = c("Distances","Participation"),
+      overlayGroups = c("Distances","IMD","Participation"),
       options = layersControlOptions(collapsed = F,autoZIndex=T) 
     ) %>%
     hideGroup("Distances") %>%
+    hideGroup("IMD") %>%
     hideGroup("Participation")
   
   
