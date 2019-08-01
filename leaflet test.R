@@ -5,8 +5,9 @@ event_sp = shapefile(x = "./raw/event_sp")
 library(leaflet)
   
   tiles_distance <- "https://bitowaqr.github.io/iol_map/tiles_distance/{z}/{x}/{y}.png"
+  tiles_participation <- "https://bitowaqr.github.io/iol_map/tiles_participation/{z}/{x}/{y}.png"
   
-  leaflet(options = leafletOptions(minZoom = 4, maxZoom = 12), width = "100%") %>%
+  leaflet(options = leafletOptions(minZoom = 4, maxZoom = 12), width = "100%",height = 800) %>%
   
     
     
@@ -17,7 +18,7 @@ library(leaflet)
     
     # my tile
     addTiles(tiles_distance, options = tileOptions(opacity = 0.5),group="Distances") %>%
-    
+    addTiles(tiles_participation, options = tileOptions(opacity = 0.5),group="Participation") %>%
     
     # established events
     addCircleMarkers(
@@ -41,14 +42,18 @@ library(leaflet)
       labFormat = labelFormat(prefix = "", suffix = "km", between = " &ndash; ",
                               digits = 0, big.mark = ",", transform = identity)
       ) %>%
+    
+    
+    
   
   # leaflet options
   setView(0, 52, zoom = 7) %>%
     addLayersControl(
       baseGroups = c("OSM","Carto"),
-      overlayGroups = c("Distances"),
+      overlayGroups = c("Distances","Participation"),
       options = layersControlOptions(collapsed = F,autoZIndex=T) 
     ) %>%
-    hideGroup("Distances")
+    hideGroup("Distances") %>%
+    hideGroup("Participation")
   
   
