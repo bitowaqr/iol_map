@@ -1,12 +1,13 @@
 
 
-
+library(raster)
 event_sp = shapefile(x = "./raw/event_sp")
 library(leaflet)
   
   tiles_distance <- "https://bitowaqr.github.io/iol_map/tiles_distance/{z}/{x}/{y}.png"
   tiles_participation <- "https://bitowaqr.github.io/iol_map/tiles_participation/{z}/{x}/{y}.png"
   tiles_imd <- "https://bitowaqr.github.io/iol_map/tiles_imd/{z}/{x}/{y}.png"
+  tiles_pop_km2 <- "https://bitowaqr.github.io/iol_map/tiles_pop_km2/{z}/{x}/{y}.png"
   
   leaflet(options = leafletOptions(minZoom = 4, maxZoom = 12), width = "100%",height = 800) %>%
   
@@ -21,6 +22,7 @@ library(leaflet)
     addTiles(tiles_distance, options = tileOptions(opacity = 0.5),group="Distances") %>%
     addTiles(tiles_participation, options = tileOptions(opacity = 0.5),group="Participation") %>%
     addTiles(tiles_imd, options = tileOptions(opacity = 0.5),group="IMD") %>%
+    addTiles(tiles_pop_km2, options = tileOptions(opacity = 0.5),group="popkm2") %>%
     
     # established events
     addCircleMarkers(
@@ -56,18 +58,23 @@ library(leaflet)
       title = "parkrun runs per <br> 1,000 per week",
       labels = c("&nbsp 0","0-0.5","0.5-1","1 - 2",">2")
     ) %>%
-    
+    addLegend(
+      group = "popkm2",
+      colors =c("darkgreen","green","orange","red","darkred"),
+      title = "Population density",
+      labels = c("Least dense","Less dense","","More dense","Most dense")
+    ) %>%
     
   
   # leaflet options
   setView(0, 52, zoom = 7) %>%
     addLayersControl(
       baseGroups = c("OSM","Carto"),
-      overlayGroups = c("Distances","IMD","Participation"),
+      overlayGroups = c("Distances","IMD","Participation","popkm2"),
       options = layersControlOptions(collapsed = F,autoZIndex=T) 
     ) %>%
     hideGroup("Distances") %>%
     hideGroup("IMD") %>%
-    hideGroup("Participation")
-  
+    hideGroup("Participation") %>%
+    hideGroup("popkm2")
   

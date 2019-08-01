@@ -6,7 +6,7 @@ library(sf)
 library(tiler)
 
 # load data
-lsoa_sf = st_as_sf(shapefile(x = "./raw/lsoa_sp"))
+lsoa_sf = read_sf("./raw/lsoa_sf.shp")
 
 # set tiler and grid options
   tiler_options(python = "python3")
