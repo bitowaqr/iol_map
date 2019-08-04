@@ -48,7 +48,7 @@
                       div(id = "button",style="border-bottom: 1px solid #CCC; background-color: rgb(80, 184,217,0.8);",
                       HTML("<button type='button' class='btn btn-info' data-toggle='collapse' data-target='#demo'>Quick help</button>")),
                       div(id = "demo", class = "collapse",
-                          style="border-bottom: 1px solid #CCC; background-color: rgb(80, 184,217,0.8);",
+                          style="border: 1px solid #CCC; background-color: rgb(80, 184,217,0.8);",
                           HTML("Identifying Optimal Locations to Maximise Access to parkrun events <br>"),
                           HTML("Some explanatio bla bla <br>"),
                           
@@ -60,12 +60,12 @@
                           ),
                           selectInput("add_layers","Show",choices = c("LSOA centroids","Something else"),multiple = T)
                       )),
-        absolutePanel(id = "info", class = "panel panel-default", fixed = TRUE,
+        absolutePanel(id = "info",  fixed = TRUE,
                       draggable = TRUE, bottom = 20, left = "auto", right = 10, top = "auto",
                       width = "280", height = "auto",
                       
                       div(id = "lsoainfo", 
-                          style="padding: 8px; border: 2px solid #CCC",
+                          style="border: 2px solid #CCC; background-color: rgb(250, 250,250,0.9);",
                       HTML(" <strong>LSOA info:</strong>"),
                       
                           htmlOutput("text1")
