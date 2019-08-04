@@ -26,59 +26,99 @@
 # User Interface
     ui <- bootstrapPage(
         # tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-        tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;}"),
+        tags$style(type = "text/css", 
+        "#map {height: calc(100vh ) !important;
+        padding-top: 10px;
+        padding-left: 10px;
+                   }"),
         # titlePanel("IOLMAP"),
         
         
         leafletOutput('map'),
-    absolutePanel(id = "title", class = "panel panel-default", fixed = TRUE,
-                  draggable = T, bottom = "auto", left = 50, right = "auto", top = 5,
-                  width = "auto", height = "auto",
-                  h4("- Identifying Optimal Locations to Maximise Access to parkrun events -")
-                  
-    ),
+    #     ,
+    # absolutePanel(id = "title", class = "panel panel-default", fixed = TRUE,
+    #               draggable = T, bottom = "auto", left = 50, right = "auto", top = 5,
+    #               width = "auto", height = "auto",
+    #               h4("- Identifying Optimal Locations to Maximise Access to parkrun events -")
+    # ),
         
-        absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                      draggable = TRUE, top = 160, right = "auto", left = 20, bottom = "auto",
-                      width = 330, height = "auto",
-                      HTML("<button type='button' class='btn btn-danger' data-toggle='collapse' data-target='#demo'>Click me</button>"),
+        absolutePanel(id = "controls",  fixed = TRUE,
+                      draggable = TRUE, top = 20, right = "auto", left = 50, bottom = "auto",
+                      width = "auto", height = "auto",
+                      div(id = "button",style="border-bottom: 1px solid #CCC; background-color: rgb(80, 184,217,0.8);",
+                      HTML("<button type='button' class='btn btn-info' data-toggle='collapse' data-target='#demo'>Quick help</button>")),
                       div(id = "demo", class = "collapse",
+                          style="border-bottom: 1px solid #CCC; background-color: rgb(80, 184,217,0.8);",
+                          HTML("Identifying Optimal Locations to Maximise Access to parkrun events <br>"),
+                          HTML("Some explanatio bla bla <br>"),
+                          
                           sliderInput(
                               inputId = "sld01_Mag",
-                              label="Useless slider input",
+                              label="Additional input?",
                               min=1, max=10,
                               value=c(5)
                           ),
-                          selectInput("add_layers","Show",choices = c("LSOA centroids","Something else"),multiple = T),
-                          div("hello", style = "font-size:75%")
+                          selectInput("add_layers","Show",choices = c("LSOA centroids","Something else"),multiple = T)
                       )),
         absolutePanel(id = "info", class = "panel panel-default", fixed = TRUE,
-                      draggable = TRUE, bottom = 80, left = "auto", right = 10, top = "auto",
-                      width = "280", height = 160,
-                      h4(" LSOA info:"),
+                      draggable = TRUE, bottom = 20, left = "auto", right = 10, top = "auto",
+                      width = "280", height = "auto",
+                      
+                      div(id = "lsoainfo", 
+                          style="padding: 8px; border: 2px solid #CCC",
+                      HTML(" <strong>LSOA info:</strong>"),
                       
                           htmlOutput("text1")
                       
                       )
+        )
     )
     
     
     server <- function(input, output) {
         
+    
         output$map <- renderLeaflet({
+            
+            
+            tag.map.ref <- tags$style(HTML("
+                      .leaflet-control.map-title {
+                        transform: translate(-50%,20%);
+                        position: fixed !important;
+                        left: 50%;
+                        text-align: center;
+                        padding-left: 10px;
+                        padding-right: 10px;
+                        background: rgba(255,255,255,0.5);
+                        
+                        font-size: 12px;
+                        border: 0;
+                      }
+                                             "))
+            ref = tags$div(id="ref",'Schneider et al.',tags$em('IOL MAP'), '2019. Data and code available at:',tags$a(href="https://github.com/bitowaqr/", "https://github.com/bitowaqr/",target="_blank"))
+            # # font-weight: bold;
+            # title <- tags$div(
+            #     tag.map.title, HTML("Identifying Optimal Locations to Maximise Access to parkrun events")
+            # )
+            
             
             tiles_distance <- "https://bitowaqr.github.io/iol_map/tiles_distance/{z}/{x}/{y}.png"
             tiles_participation <- "https://bitowaqr.github.io/iol_map/tiles_participation/{z}/{x}/{y}.png"
             tiles_imd <- "https://bitowaqr.github.io/iol_map/tiles_imd/{z}/{x}/{y}.png"
             tiles_pop_km2 <- "https://bitowaqr.github.io/iol_map/tiles_pop_km2/{z}/{x}/{y}.png"
-            
+            popkm2.lab = "popkm2 <br> <br><u> Recommendations</u>: "
             
             leaflet(options = leafletOptions(minZoom = 4, maxZoom = 12), width = "100%") %>% 
+                # alternative: show unmoving title on top?
+                # addControl(title, position = "topleft", className="map-title") %>%
+            addControl(ref, position = "bottomleft", className="map-ref") %>%    
+                
+                
                 
                 addLayersControl(
                     baseGroups = c("OSM","Carto"),
-                    overlayGroups = c("Distances","IMD","Participation","popkm2","runs_imd","runs_tot","dist_imd","dist_tot"),
-                    options = layersControlOptions(collapsed = F,autoZIndex=F) 
+                    overlayGroups = c("Distances","IMD","Participation",popkm2.lab,"runs_imd","runs_tot","dist_imd","dist_tot"),
+                    options = layersControlOptions(collapsed = F,autoZIndex=F,opacity=0) 
                 ) %>%
                 # provider tile
                 addTiles(group="OSM") %>%
@@ -88,7 +128,7 @@
                 addTiles(tiles_distance, options = tileOptions(opacity = 0.5),group="Distances") %>%
                 addTiles(tiles_participation, options = tileOptions(opacity = 0.5),group="Participation") %>%
                 addTiles(tiles_imd, options = tileOptions(opacity = 0.5),group="IMD") %>%
-                addTiles(tiles_pop_km2, options = tileOptions(opacity = 0.5),group="popkm2") %>%
+                addTiles(tiles_pop_km2, options = tileOptions(opacity = 0.5),group=popkm2.lab) %>%
                 
     # established parkrun events
                 addCircleMarkers(
@@ -108,7 +148,7 @@
         # RUNS with IMD weights
                 addCircleMarkers(
                     data = runs_imd, group = "runs_imd", 
-                    radius=7,opacity = 1,color=NULL,stroke = F,fillColor="orange",fillOpacity =  0.8,
+                    radius=7,opacity = 1,color=NULL,stroke = F,fillColor="orange",fillOpacity =  0.5,
                     lng = ~lon, lat = ~lat,
                     label=as.character(runs_imd$pos),
                     labelOptions = labelOptions(noHide = T, textsize = "10px",textOnly = T, direction ="center")
@@ -116,7 +156,7 @@
         # RUNS TOTAL
                 addCircleMarkers(
                     data = runs_tot, group = "runs_tot", 
-                    radius=7,opacity = 1,color=NULL,stroke = F,fillColor="pink",fillOpacity =  0.8,
+                    radius=7,opacity = 1,color=NULL,stroke = F,fillColor="pink",fillOpacity =  0.5,
                     lng = ~lon, lat = ~lat,
                     label=as.character(runs_tot$pos),
                     labelOptions = labelOptions(noHide = T, textsize = "10px",textOnly = T, direction ="center")
@@ -124,7 +164,7 @@
         # DIST with IMD weights
                 addCircleMarkers(
                     data = dist_imd, group = "dist_imd", 
-                    radius=7,opacity = 1,color=NULL,stroke = F,fillColor="purple",fillOpacity =  0.8,
+                    radius=7,opacity = 1,color=NULL,stroke = F,fillColor="purple",fillOpacity =  0.5,
                     lng = ~lon, lat = ~lat,
                     label=as.character(dist_imd$pos),
                     labelOptions = labelOptions(noHide = T, textsize = "10px",textOnly = T, direction ="center")
@@ -132,7 +172,7 @@
         # DIST TOTAL
                 addCircleMarkers(
                     data = dist_tot, group = "dist_tot", 
-                    radius=7,opacity = 1,color=NULL,stroke = F,fillColor="green",fillOpacity =  0.8,
+                    radius=7,opacity = 1,color=NULL,stroke = F,fillColor="green",fillOpacity =  0.5,
                     lng = ~lon, lat = ~lat,
                     label=as.character(dist_tot$pos),
                     labelOptions = labelOptions(noHide = T, textsize = "10px",textOnly = T, direction ="center")
@@ -161,7 +201,7 @@
                     labels = c("&nbsp 0","0-0.5","0.5-1","1 - 2",">2")
                 ) %>%
                 addLegend(
-                    group = "popkm2",
+                    group = popkm2.lab,
                     colors =c("darkgreen","green","orange","red","darkred"),
                     title = "Population density",
                     labels = c("Least dense","Less dense","","More dense","Most dense")
@@ -173,7 +213,7 @@
                 hideGroup("Distances") %>%
                 hideGroup("IMD") %>%
                 hideGroup("Participation") %>%
-                hideGroup("popkm2") %>%
+                hideGroup(popkm2.lab) %>%
                 hideGroup("runs_imd") %>%
                 hideGroup("runs_tot") %>%
                 hideGroup("dist_imd") %>%
