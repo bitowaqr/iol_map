@@ -6,7 +6,7 @@ library(sf)
 library(tiler)
 
 # load data
-lsoa_sf = read_sf("./raw/lsoa_sf.shp")
+  lsoa_sf = read_sf("./raw/lsoa_sf.shp")
 
 # set tiler and grid options
   tiler_options(python = "python3")
@@ -65,4 +65,19 @@ lsoa_sf = read_sf("./raw/lsoa_sf.shp")
   nodata = "white"
   tile(pop_km2_tif_path, tile_dir_pop_km2, "4-12", col = pal_pop_km2,crs = crs_pop_km2)
   rm("rasterized_lsoa_pop_km2") 
+  
+  
+# green spaces tiles
+  greens_sf = read_sf("./raw/trimmed_greenspaces.shp") # raw files too large for github
+  tile_dir_greenspaces = paste(getwd(),"/tiles_greenspaces/",sep="")
+  rasterized_greenspaces = fasterize(greens_sf, raster_grid)
+  greenspaces_tif_path = "./raw/greenspaces.tif"
+  writeRaster(rasterized_greenspaces, filename=greenspaces_tif_path, format="GTiff", overwrite=TRUE)
+  crs_greens = as.character(crs(greens_sf))
+  green_col = colorRampPalette(c("cyan"))(1)
+  nodata = "white"
+  tile(greenspaces_tif_path, tile_dir_greenspaces, "4-12", col = green_col,crs = crs_greens)
+  rm("rasterized_greenspaces") 
+  
+  
 
