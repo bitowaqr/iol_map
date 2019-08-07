@@ -8,6 +8,7 @@
     library(sp)
     library(sf)
     print("packages loaded")
+    
 
 # load data
     # lsoa data
@@ -19,9 +20,10 @@
     runs_tot = shapefile("./events/opt_loc_runs.prep.shp")
     dist_imd = shapefile("./events/opt_loc_dist_imd.prep.shp")
     dist_tot = shapefile("./events/opt_loc_dist.prep.shp")
+    # green spaces considered in the analysis
+    greens_coordinates = read.csv("./greenspaces/greens_coordinates.csv")
+    # ok
     print("Data loaded")
-
-
     
 # User Interface
     ui <- bootstrapPage(
@@ -50,15 +52,8 @@
                       div(id = "demo", class = "collapse",
                           style="border: 1px solid #CCC; background-color: rgb(80, 184,217,0.8);",
                           HTML("Identifying Optimal Locations to Maximise Access to parkrun events <br>"),
-                          HTML("Some explanatio bla bla <br>"),
+                          HTML("Some explanatio bla bla <br>")
                           
-                          sliderInput(
-                              inputId = "sld01_Mag",
-                              label="Additional input?",
-                              min=1, max=10,
-                              value=c(5)
-                          ),
-                          selectInput("add_layers","Show",choices = c("LSOA centroids","Something else"),multiple = T)
                       )),
         absolutePanel(id = "info",  fixed = TRUE,
                       draggable = TRUE, bottom = 20, left = "auto", right = 10, top = "auto",
@@ -114,15 +109,32 @@
             addControl(ref, position = "bottomleft", className="map-ref") %>%    
                 
                 
+                addCircleMarkers(data=greens_coordinates,
+                                 lng = ~lng, lat = ~lat,
+                                 radius = 5, 
+                                 stroke = T,color="white",weight=1,
+                                 fillColor="seagreen1",fillOpacity=1,
+                                 group = "Green spaces",
+                                 popup = paste("Name: ",greens_coordinates$name,"<br>",
+                                               "Type: ", greens_coordinates$type,"<br>",
+                                               "Area (km2) :", round(greens_coordinates$area_km2,2),"<br>",
+                                               "Coordinates: ", round(greens_coordinates$lng,5),"; ", round(greens_coordinates$lat,5),"<br>",
+                                               "<a href='https://www.google.com/maps/@",greens_coordinates$lat,",",greens_coordinates$lng,"15z  target='_blank'>Show on Google Maps</a>",
+                                               sep=""
+                                               
+                                               )
+                                 
+                                 ) %>%
+                
                 
                 addLayersControl(
-                    baseGroups = c("OSM","Carto"),
-                    overlayGroups = c("Distances","IMD","Participation",popkm2.lab,"runs_imd","runs_tot","dist_imd","dist_tot"),
+                    baseGroups = c("OSM","Carto <br> <br> Tiles"),
+                    overlayGroups = c("Green spaces","Distances","IMD","Participation",popkm2.lab,"runs_imd","runs_tot","dist_imd","dist_tot"),
                     options = layersControlOptions(collapsed = F,autoZIndex=F,opacity=0) 
                 ) %>%
                 # provider tile
                 addTiles(group="OSM") %>%
-                addProviderTiles(providers$CartoDB.Positron, group="Carto") %>% 
+                addProviderTiles(providers$CartoDB.Positron, group="Carto <br> <br> Tiles") %>% 
     
                 # my tile
                 addTiles(tiles_distance, options = tileOptions(opacity = 0.5),group="Distances") %>%
@@ -217,7 +229,10 @@
                 hideGroup("runs_imd") %>%
                 hideGroup("runs_tot") %>%
                 hideGroup("dist_imd") %>%
-                hideGroup("dist_tot") 
+                hideGroup("dist_tot") %>%
+                hideGroup("Green spaces") 
+            
+            
                     
             
         })

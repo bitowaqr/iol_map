@@ -14,7 +14,7 @@ lsoa_sf = read_sf("./raw/lsoa_sf.shp")
   extent(raster_grid) = extent(lsoa_sf)
 
   
-#### RASTERIZE AND TILE
+#### RASTERIZE AND TILE (cave: high CPU demand!)
   
 # mn distance tile
   tile_dir_mn_dstn = paste(getwd(),"/tiles_distance/",sep="")
@@ -66,18 +66,3 @@ lsoa_sf = read_sf("./raw/lsoa_sf.shp")
   tile(pop_km2_tif_path, tile_dir_pop_km2, "4-12", col = pal_pop_km2,crs = crs_pop_km2)
   rm("rasterized_lsoa_pop_km2") 
 
-
- # x = RGB(rasterized_lsoa_mn_dstn5,col=colorRampPalette(c("darkgreen","yellow","greenyellow","gold","orange", "red","darkred"))(10))
-# plotRGB(x)
-
-
-# tiles = "https://bitowaqr.github.io/iol_map/tiles/{z}/{x}/{y}.png"
-# leaflet(options = leafletOptions(minZoom = 4, maxZoom = 11), width = "100%") %>% 
-#   addProviderTiles(providers$CartoDB.Positron) %>% 
-#   addTiles(tiles, options = tileOptions(opacity = 1)) %>%
-#   setView(0, 52, zoom = 5) 
-# 
-# 
-# 
-# 
-# 
