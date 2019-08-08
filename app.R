@@ -76,7 +76,6 @@
                       draggable = TRUE, top = 230, right = 10, left = "auto", bottom = "auto",
                       width = 220, height = "auto",
                       div(id="selection_boxes",
-                          actionButton("show", "Show modal dialog"),
                           style="border: 2px solid #CCC; background-color: rgb(255, 255,255,1);padding:10px; font-size:100%",
                           checkboxGroupInput(inputId = "rec_choice",
                                              label = "New parkrun event locations:",
@@ -100,21 +99,26 @@
                       width = "auto", height = "auto",
                       # info text
                       div(id = "button",style="border-bottom: 1px solid #CCC; background-color: rgb(250, 250,250,0);",
-                      HTML("<button type='button' class='btn btn-info' data-toggle='collapse' data-target='#demo'>Quick help</button>")
-                      ),
-                      div(id = "demo", class = "collapse",
-                          style="border: 1px solid #CCC; background-color: rgb(250, 250,250,0.9); width: 700px;",
-                          HTML("<br>This map shows the results of a research project, aimed at supporting parkrun's 
-                               plan to create 200 new parkrun events across England. More about the study can be found "),
-                          
-                          HTML("<a href='https://github.com/bitowaqr/iolmap_analysis' target='_blank'>here</a>"),
-                          HTML(".<hr>"),
-                          
-                          HTML("<strong>Tutorial</strong><br>
-                               Space for a short and good explanation of the important features of this map..."),
-                          HTML("<br><hr>Contact: ...")
-                          
-                      )),
+                          tags$head(
+                              tags$style(HTML('#show{background-color:cyan}'))
+                          ),
+                          actionButton("show", "Quick Help"))),
+                      # HTML("<button type='button' class='btn btn-info' data-toggle='collapse' data-target='#demo'>Quick help</button>")
+                      # ),
+                      # div(id = "demo", class = "collapse",
+                      #     style="border: 1px solid #CCC; background-color: rgb(250, 250,250,0.9); width: 700px;",
+                      #     HTML("<br>This map shows the results of a research project, aimed at supporting parkrun's 
+                      #          plan to create 200 new parkrun events across England. More about the study can be found "),
+                      #     
+                      #     HTML("<a href='https://github.com/bitowaqr/iolmap_analysis' target='_blank'>here</a>"),
+                      #     HTML(".<hr>"),
+                      #     
+                      #     HTML("<strong>Tutorial</strong><br>
+                      #          Space for a short and good explanation of the important features of this map..."),
+                      #     HTML("<br><hr>Contact: ...")
+                      #     
+                      # )
+                      # ),
         
         # LSOA INFO PANEL
         absolutePanel(id = "info",  fixed = TRUE,
@@ -135,11 +139,15 @@
         
         observeEvent(input$show, {
             showModal(modalDialog(
-                title = "Somewhat important message",
-                HTML('<img src="http://www.google.nl/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png">'),
-                "more text",size="l",
+                title = "Identifying Optimal Locations for Maximising Access to parkun",
+                
+                HTML("This map shows the results of a research project, aimed at supporting parkrun's plan to create 200 new parkrun events across England. More about the study can be found "),
+                     HTML("<a href='https://github.com/bitowaqr/iolmap_analysis' target='_blank'>here</a>. <br><br>"),
+                HTML('<img src="https://github.com/bitowaqr/iol_map/raw/master/tooltip.png" width="600" > <hr>'),
+                HTML("Contact:..."),
+                size="l",
                 easyClose = TRUE,
-                footer = modalButton("Dismiss")
+                footer = modalButton("Close")
             ))
         })
             
