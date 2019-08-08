@@ -1,5 +1,6 @@
 
 # parkrun iolmap app prototype I
+# paul schneider 2019
 
 # load packages
     library(shiny)
@@ -12,20 +13,20 @@
     
  # loading screen   
     appCSS <- "
-#loading-content {
-  position: absolute;
-  background: #000000;
-  padding-top: 250px;
-  opacity: 0.9;
-  z-index: 100;
-  font-size:30px;
-  left: 0;
-  right: 0;
-  height: 100%;
-  text-align: center;
-  color: cyan;
-}
-"
+                  #loading-content {
+                    position: absolute;
+                    background: #000000;
+                    padding-top: 250px;
+                    opacity: 0.9;
+                    z-index: 100;
+                    font-size:30px;
+                    left: 0;
+                    right: 0;
+                    height: 100%;
+                    text-align: center;
+                    color: cyan;
+                  }
+                  "
     
     print("packages loaded")
     
@@ -48,8 +49,6 @@
     dist_tot_label = "min total Distances"
     parkrun_label = "Established parkrun events"
     
-
-
 # load data
     # lsoa data
     lsoa_sf = read_sf("./raw/lsoa_sf.shp")
@@ -79,7 +78,9 @@
     greens_coordinates = read.csv("./raw/greens_coordinates.csv")
     print("Data loaded")
     
-# User Interface
+    
+    
+################# USER INTERFACE
     ui <- bootstrapPage(
         
         useShinyjs(),
@@ -88,7 +89,8 @@
         # Loading message
         div(
             id = "loading-content",
-            HTML("Just one moment please <br><br> Loading...")
+            HTML("Loading...<br>"),
+            HTML("Just one moment please.")
         ),
         
         
@@ -133,22 +135,7 @@
                               tags$style(HTML('#show{background-color:cyan}'))
                           ),
                           actionButton("show", "Quick Help"))),
-                      # HTML("<button type='button' class='btn btn-info' data-toggle='collapse' data-target='#demo'>Quick help</button>")
-                      # ),
-                      # div(id = "demo", class = "collapse",
-                      #     style="border: 1px solid #CCC; background-color: rgb(250, 250,250,0.9); width: 700px;",
-                      #     HTML("<br>This map shows the results of a research project, aimed at supporting parkrun's 
-                      #          plan to create 200 new parkrun events across England. More about the study can be found "),
-                      #     
-                      #     HTML("<a href='https://github.com/bitowaqr/iolmap_analysis' target='_blank'>here</a>"),
-                      #     HTML(".<hr>"),
-                      #     
-                      #     HTML("<strong>Tutorial</strong><br>
-                      #          Space for a short and good explanation of the important features of this map..."),
-                      #     HTML("<br><hr>Contact: ...")
-                      #     
-                      # )
-                      # ),
+                      
         
         # LSOA INFO PANEL
         absolutePanel(id = "info",  fixed = TRUE,
@@ -164,23 +151,29 @@
     )
     
     
+################# SERVER    
+    
     server <- function(input, output) {
-        
         
         observeEvent(input$show, {
             showModal(modalDialog(
-                title = "Identifying Optimal Locations for Maximising Access to parkun",
+                title = "Quick Help - Identifying Optimal Locations for Maximising Access to parkun",
                 
-                HTML("This map shows the results of a research project, aimed at supporting parkrun's plan to create 200 new parkrun events across England. More about the study can be found "),
-                     HTML("<a href='https://github.com/bitowaqr/iolmap_analysis' target='_blank'>here</a>. <br><br>"),
-                HTML('<img src="https://github.com/bitowaqr/iol_map/raw/master/tooltip.png" width="600" > <hr>'),
-                HTML("Contact:..."),
+                HTML("This map shows the results of a research project, aimed at supporting parkrun's plan to create 
+                200 new parkrun events across England. Some basic tool tips are shown below. More details about 
+                the findings of our study, as well as the data and source code used to generate the results can be found
+                <a href='https://github.com/bitowaqr/iolmap_analysis' target='_blank'>here</a>. <br><br>'"),
+                HTML('<img src="https://github.com/bitowaqr/iol_map/raw/master/tooltip.png" width="850" >'),
                 size="l",
-                easyClose = TRUE,
-                footer = modalButton("Close")
+                easyClose = TRUE,footer=NULL,
+                HTML('<br><hr>&nbsp&nbsp  <a href = "https://www.sheffield.ac.uk/scharr/staff-pgrs/studentprofiles/paulschneider" target="_blank">Paul Schneider</a>, 2019',
+                     '<button type="button" class="btn btn-primary" data-dismiss="modal" style="float: right;" >Close</button><br><br>')
             ))
         })
             
+          
+          
+####### ---->  BUILD LEAFLET MAP
         output$map <- renderLeaflet({
             
 
@@ -193,7 +186,6 @@
             tags$a(href="https://github.com/bitowaqr/iolmap_analysis", "Github",target="_blank"))
             
             
-####### ---->  BUILD LEAFLET MAP   
             
         map <- leaflet(options = leafletOptions(minZoom = 7, maxZoom = 12), width = "100%") %>% 
     
@@ -210,7 +202,7 @@
                     baseGroups = c("CartoDB Basemap","CartoDB Darkmode<br> "),
                     overlayGroups = c(greens_label,parkrun_label,
                                       popkm2.lab,imd_label,dist_label,part_label
-                                      #,runs_imd_label,runs_tot_label,dist_imd_label,dist_tot_label
+                                      #,runs_imd_label,runs_tot_label,dist_imd_label,dist_tot_label # layer control moved to shiny div
                                       ),
                     options = layersControlOptions(collapsed = F,autoZIndex=F,opacity=0) 
                 ) %>%
@@ -226,7 +218,6 @@
                 addCircles(
                     group = parkrun_label,
                     data = event_sp,
-                    # lng = ~lon,lat = ~lat,
                     radius = 100,fillColor = "blue",
                     stroke = F, fillOpacity = 1,
                     opacity = 1,color="blue"
@@ -234,7 +225,6 @@
                 addCircles(
                     group = parkrun_label,
                     data = event_sp,
-                    # lng = ~lon,lat = ~lat,
                     radius = 2500,fillColor = "blue",
                     stroke = F, fillOpacity = 0.4,
                     opacity = 1,color="blue",weight = 1,
@@ -259,9 +249,7 @@
                                                "Coordinates: ", round(greens_coordinates$lng,5),"; ", round(greens_coordinates$lat,5),"<br>",
                                                "<a href='https://www.google.com/maps/@",greens_coordinates$lat,",",greens_coordinates$lng,",2515m/data=!3m1!1e3' target='_blank'>Show on Google Maps</a>",
                                                sep=""
-                                               
                                  )
-                                 
                 ) %>%
                 
     # NEW EVENTS 
@@ -424,75 +412,67 @@
     
             map
             
+        })
+    
+        
+        
+########## DO OTHER SERVER THINGS 
+        
+        
+        # create reactivr obj to keep track of last selected
+        prev_row <- reactiveVal()
+        
+        # OBSERVE RECOMMENDATION INPUT and update leaflet + datatable proxies
+        observe({
+            
+            # print(input$rec_choice)
+            
+            possible_choices = c(runs_imd_label,
+                                 runs_tot_label,
+                                 dist_imd_label,
+                                 dist_tot_label)
+            selected_recommendations = possible_choices %in% input$rec_choice
+            unselected_recommendation = !selected_recommendations
+            sum_selection = sum(selected_recommendations)
+            # update map
+            leafletProxy("map") %>%
+                hideGroup(possible_choices[unselected_recommendation]) %>%
+                showGroup(possible_choices[selected_recommendations]) 
+            
+            # update table
+            # draw table raw
+            if(sum_selection==1){ # only shoe table when 1 set of recommendations is selected
+              output$table01 <- renderDataTable({
+                recommendations.df_selected_rows = recommendations.df$set %in% possible_choices[selected_recommendations]
+                
+                DT::datatable(data=recommendations.df[recommendations.df_selected_rows,c("pos","greenspace_name")],height=200,
+                              options=list(searching=F,pageLength = 10,lengthMenu=c(5,30,50), lengthChange = FALSE,rownames= FALSE,stateSave = TRUE),
+                              class="compact",rownames=F,selection = "single")
+              })
+            }
+            if(sum_selection<1){ # not show when nothing selected
+              output$table01 <- renderDataTable({
+            
+                    DT::datatable(data=data.frame(pos =NA,greenspace_name= "Select a set of location recommendation set from above."),
+                                  options=list(searching=F,pageLength = 10, lengthChange = FALSE,rownames= FALSE,stateSave = TRUE),
+                                  class="compact",rownames=F,selection = "single")
+                
+                })
+            }
+            if(sum_selection>1){ # not show when >1 selected
+                output$table01 <- renderDataTable({
                     
+                    DT::datatable(data=data.frame(pos =NA,greenspace_name= "Cannot show details for more than 1 set of location recommendations."),
+                                  options=list(searching=F,pageLength = 10, lengthChange = FALSE,rownames= FALSE,stateSave = TRUE),
+                                  class="compact",rownames=F,selection = "single")
+                })
+            }
             
-        })
-    
-    prev_row <- reactiveVal()
-    my_icon = makeAwesomeIcon(icon = 'flag', markerColor = 'red', iconColor = 'white')
-    
-    
-    # INPUT OBSERVER
-    observe({
-        
-        # print(input$rec_choice)
-        
-        possible_choices = c(runs_imd_label,
-                             runs_tot_label,
-                             dist_imd_label,
-                             dist_tot_label)
-        selected_recommendations = possible_choices %in% input$rec_choice
-        unselected_recommendation = !selected_recommendations
-        sum_selection = sum(selected_recommendations)
-        # update map
-        leafletProxy("map") %>%
-            hideGroup(possible_choices[unselected_recommendation]) %>%
-            showGroup(possible_choices[selected_recommendations]) 
-        
-        # update table
-        # draw table raw
-        if(sum_selection==1){
-        output$table01 <- renderDataTable({
-            
-            
-            
-            recommendations.df_selected_rows = recommendations.df$set %in% possible_choices[selected_recommendations]
-            
-            DT::datatable(data=recommendations.df[recommendations.df_selected_rows,c("pos","greenspace_name")],height=200,
-                          options=list(searching=F,pageLength = 10,lengthMenu=c(5,30,50), lengthChange = FALSE,rownames= FALSE,stateSave = TRUE),
-                          class="compact",rownames=F,selection = "single")
-        })
-        }
-        if(sum_selection<1){
-            output$table01 <- renderDataTable({
-                
-                
-                DT::datatable(data=data.frame(pos =NA,greenspace_name= "Select a set of location recommendation set from above."),
-                              options=list(searching=F,pageLength = 10, lengthChange = FALSE,rownames= FALSE,stateSave = TRUE),
-                              class="compact",rownames=F,selection = "single")
-            
-            })
-        }
-        if(sum_selection>1){
-            output$table01 <- renderDataTable({
-                
-                
-                DT::datatable(data=data.frame(pos =NA,greenspace_name= "Cannot show details for more than 1 set of location recommendations."),
-                              options=list(searching=F,pageLength = 10, lengthChange = FALSE,rownames= FALSE,stateSave = TRUE),
-                              class="compact",rownames=F,selection = "single")
-                
-            })
-        }
-            
-            
-            
-        
-        
-        })
+            }) 
     
     
     
-    # DATATABLE OBSERVER
+    # OBSERVE DT SELECTION
     observeEvent(input$table01_rows_selected, {
         
         possible_choices = c(runs_imd_label,
@@ -501,11 +481,9 @@
                              dist_tot_label)
         selected_recommendations = possible_choices %in% input$rec_choice
         recommendations.df_selected_rows = recommendations.df$set %in% possible_choices[selected_recommendations]
-        
         row_selected = recommendations.df[recommendations.df_selected_rows,][input$table01_rows_selected,]
         
-        #print(row_selected)
-        # HIGHLIGHT
+        # HIGHLIGHT SELECTED LOCATION
         leafletProxy('map') %>%
             addCircleMarkers(layerId =  paste(row_selected$lon,row_selected$lat,row_selected$set),
                              group = row_selected$set,
@@ -521,25 +499,18 @@
                              label=as.character(row_selected$pos),
                              labelOptions = labelOptions(noHide = T, textsize = "10px",textOnly = T,  direction ="center",clickable=T))
         
-        
-        
+        # REMOVE previously selected location when a new one is chosen
         if(!is.null(prev_row())){
             leafletProxy('map') %>%
                 removeMarker(paste(prev_row()$lon,prev_row()$lat,prev_row()$set))
-                    
-                    
         }
-        # set new value to reactiveVal 
+        
+        # update prev selected
         prev_row(row_selected)
     })
     
     
-    
-    
-    
-    
-    
-        # click to get info
+      # OBSERVE map click - click to get info
         observeEvent(input$map_click,ignoreNULL = F, {
             if(!is.null(input$map_click)){
                 click_location <- input$map_click
@@ -552,11 +523,11 @@
                 lsoa_name = ifelse(nchar(hit$name)>30,
                                    paste(substr(hit$name,1,30),"...",sep=""),
                                    hit$name)
-                print(lsoa_name)
+                # print(lsoa_name)
 
                 } else {
                     hit = as.data.frame(lsoa_sf)[11467,]
-                    lsoa_name = "<b>Not found</b>" # quick and dirty solution to avoid NA
+                    lsoa_name = "<b>Not found</b>" # quick and dirty solution to avoid NA error
                 }
             } else {
                 hit = as.data.frame(lsoa_sf)[11467,]
@@ -564,7 +535,7 @@
                                    paste(substr(hit$name,1,30),"...",sep=""),
                                    hit$name)
             }
-                
+                # render text for abs panel box
             output$text1 <- renderUI({
                 str1 <- paste("&nbsp Name:",lsoa_name)
                 str3 <- paste("&nbsp Population:",hit$pop)
@@ -576,9 +547,9 @@
             })
             
             
-            
         })
         
+        # loading screen fade
         hide(id = "loading-content", anim = TRUE, animType = "fade",time = 3)    
         show("app-content")
         
