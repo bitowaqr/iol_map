@@ -8,6 +8,25 @@
     library(sp)
     library(sf)
     library(DT)
+    library(shinyjs)
+    
+ # loading screen   
+    appCSS <- "
+#loading-content {
+  position: absolute;
+  background: #000000;
+  padding-top: 250px;
+  opacity: 0.9;
+  z-index: 100;
+  font-size:30px;
+  left: 0;
+  right: 0;
+  height: 100%;
+  text-align: center;
+  color: cyan;
+}
+"
+    
     print("packages loaded")
     
 # urls to get custom tiles
@@ -62,6 +81,17 @@
     
 # User Interface
     ui <- bootstrapPage(
+        
+        useShinyjs(),
+        inlineCSS(appCSS),
+        
+        # Loading message
+        div(
+            id = "loading-content",
+            HTML("Just one moment please <br><br> Loading...")
+        ),
+        
+        
         tags$style(type = "text/css", 
         "#map {height: calc(100vh ) !important;
         padding-top: 10px;
@@ -549,6 +579,8 @@
             
         })
         
+        hide(id = "loading-content", anim = TRUE, animType = "fade",time = 3)    
+        show("app-content")
         
     }
     
